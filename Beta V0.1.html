@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BETA v0.2: Call Center Tool</title>
+    <title>BETA v0.3: Call Center Tool</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -48,27 +48,241 @@
             border-bottom-color: #2563EB; /* blue-600 */
             color: #2563EB; /* blue-600 */
         }
+        
+        /* Helper class for conditional fields */
+        .conditional-field {
+            transition: all 0.3s ease-in-out;
+            max-height: 1000px;
+            opacity: 1;
+            overflow: hidden;
+            padding-top: 0.5rem; /* space-y-2 equivalent */
+            margin-top: 0.5rem;
+        }
+        .conditional-field.hidden {
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0;
+            margin-top: 0;
+        }
+        
+        /* Style for reference lists */
+        .reference-item {
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+        }
+        .dark .reference-item {
+            border-bottom-color: #374151; /* gray-700 */
+        }
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
-    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
 
         <header class="text-center mb-8">
             <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-4">
-                Call Center Tool (BETA v0.2)
+                Call Center Tool (BETA v0.3)
             </h1>
-            <nav class="flex justify-center border-b border-gray-300 dark:border-gray-700">
-                <button id="tab-btn-generator" class="tab-btn active text-lg font-semibold py-4 px-6 focus:outline-none">
-                    Template Generator
+            <nav class="flex flex-wrap justify-center border-b border-gray-300 dark:border-gray-700">
+                <button id="tab-btn-advanced" class="tab-btn active text-lg font-semibold py-4 px-6 focus:outline-none">
+                    Advanced Generator
+                </button>
+                <button id="tab-btn-simple" class="tab-btn text-lg font-semibold py-4 px-6 focus:outline-none">
+                    Simple Generator
                 </button>
                 <button id="tab-btn-checklist" class="tab-btn text-lg font-semibold py-4 px-6 focus:outline-none">
-                    QA Checklist
+                    Verification Checklist
+                </button>
+                <button id="tab-btn-reference" class="tab-btn text-lg font-semibold py-4 px-6 focus:outline-none">
+                    Reference
                 </button>
             </nav>
         </header>
 
-        <main id="tab-content-generator" class="tab-content">
+        <main id="tab-content-advanced" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md">
+                        <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-t-lg">
+                            <h2 class="text-lg font-bold text-gray-900 dark:text-white">1. Caller & Patient Info</h2>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Is caller the patient?</label>
+                                    <div class="flex space-x-4">
+                                        <label class="flex items-center"><input type="radio" name="adv-caller" value="yes" class="h-4 w-4" checked> <span class="ml-2">Yes</span></label>
+                                        <label class="flex items-center"><input type="radio" name="adv-caller" value="no" class="h-4 w-4"> <span class="ml-2">No</span></label>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="adv-patient-type" class="block text-sm font-medium mb-1">Patient Type</label>
+                                    <select id="adv-patient-type" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                                        <option value="EP">Established Patient (EP)</option>
+                                        <option value="NP">New Patient (NP)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="adv-caller-details" class="conditional-field hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="adv-caller-name" class="block text-sm font-medium mb-1">Caller's Name</label>
+                                    <input type="text" id="adv-caller-name" placeholder="e.g., Jane Doe" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label for="adv-caller-phone" class="block text-sm font-medium mb-1">Caller's Phone</label>
+                                    <input type="text" id="adv-caller-phone" placeholder="e.g., 555-1234" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="adv-patient-name" class="block text-sm font-medium mb-1">Patient's Name</label>
+                                    <input type="text" id="adv-patient-name" placeholder="e.g., John Doe" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label for="adv-patient-phone" class="block text-sm font-medium mb-1">Patient's Phone</label>
+                                    <input type="text" id="adv-patient-phone" placeholder="e.g., 555-5678" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md">
+                        <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-t-lg">
+                            <h2 class="text-lg font-bold text-gray-900 dark:text-white">2. Core Call Details</h2>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="adv-scripted-format" class="block text-sm font-medium mb-1">Scripted Format (Template)</label>
+                                <select id="adv-scripted-format" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></select>
+                            </div>
+                             <div>
+                                <label for="adv-call-reason" class="block text-sm font-medium mb-1">Call Reason</label>
+                                <input type="text" id="adv-call-reason" placeholder="e.g., Annual Exam, Checkup" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                            </div>
+                            <div>
+                                <label for="adv-referral" class="block text-sm font-medium mb-1">Referral Source</label>
+                                <input type="text" id="adv-referral" placeholder="e.g., Dr. Smith, Google" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                            </div>
+                            <div>
+                                <label for="adv-insurance" class="block text-sm font-medium mb-1">Insurance</label>
+                                <input type="text" id="adv-insurance" placeholder="e.g., BCBS, Aetna" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                            </div>
+                            <div>
+                                <label for="adv-pec-doctor" class="block text-sm font-medium mb-1">PEC Doctor</label>
+                                <input type="text" id="adv-pec-doctor" placeholder="e.g., Elavsky, Brooke" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                            </div>
+                            <div>
+                                <label for="adv-pec-location" class="block text-sm font-medium mb-1">PEC Location</label>
+                                <select id="adv-pec-location" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-yellow-50 dark:bg-yellow-900/50 border-2 border-yellow-400 rounded-xl shadow-md">
+                        <div class="p-4 bg-yellow-100 dark:bg-yellow-800/60 rounded-t-lg">
+                            <h2 class="text-lg font-bold text-yellow-800 dark:text-yellow-200">3. Triage Questions</h2>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Have you experienced any sudden or emergent Eye Problems?</label>
+                                <div class="flex space-x-4">
+                                    <label class="flex items-center"><input type="radio" name="adv-triage-emergent" value="yes" class="h-4 w-4"> <span class="ml-2">Yes</span></label>
+                                    <label class="flex items-center"><input type="radio" name="adv-triage-emergent" value="no" class="h-4 w-4" checked> <span class="ml-2">No</span></label>
+                                </div>
+                            </div>
+                            
+                            <div id="adv-triage-details" class="conditional-field hidden space-y-4 pt-4 border-t border-yellow-300 dark:border-yellow-700">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="adv-triage-reason" class="block text-sm font-medium mb-1">Triage Reason</label>
+                                        <select id="adv-triage-reason" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></select>
+                                    </div>
+                                    <div>
+                                        <label for="adv-triage-symptoms" class="block text-sm font-medium mb-1">Symptoms</label>
+                                        <select id="adv-triage-symptoms" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></select>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Is there any pain?</label>
+                                        <select id="adv-triage-pain" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Previous Eye Sx?</label>
+                                        <select id="adv-triage-prev-sx" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">CL Wearer?</label>
+                                        <select id="adv-triage-cl-wearer" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></select>
+                                    </div>
+                                    <div>
+                                        <label for="adv-triage-onset-days" class="block text-sm font-medium mb-1">Time experiencing symptoms (days):</label>
+                                        <input type="number" id="adv-triage-onset-days" placeholder="e.g., 3" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md">
+                        <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-t-lg">
+                            <h2 class="text-lg font-bold text-gray-900 dark:text-white">4. Appointment & Misc.</h2>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="adv-current-appt-date" class="block text-sm font-medium mb-1">Current Appt Date</label>
+                                <input type="date" id="adv-current-appt-date" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                            </div>
+                            <div>
+                                <label for="adv-current-appt-time" class="block text-sm font-medium mb-1">Current Appt Time</label>
+                                <input type="time" id="adv-current-appt-time" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                            </div>
+                            <div>
+                                <label for="adv-new-appt-date" class="block text-sm font-medium mb-1">New Appt Date</label>
+                                <input type="date" id="adv-new-appt-date" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                            </div>
+                            <div>
+                                <label for="adv-new-appt-time" class="block text-sm font-medium mb-1">New Appt Time</label>
+                                <input type="time" id="adv-new-appt-time" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="adv-recall-date" class="block text-sm font-medium mb-1">Recall Date</label>
+                                <input type="date" id="adv-recall-date" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="adv-misc-notes" class="block text-sm font-medium mb-1">Other Misc. Notes</label>
+                                <textarea id="adv-misc-notes" rows="3" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600" placeholder="e.g., Free AT regimen advised..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="lg:col-span-1">
+                    <div class="sticky top-6 bg-white dark:bg-gray-800 rounded-xl shadow-md">
+                        <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-t-lg">
+                            <h2 class="text-lg font-bold text-gray-900 dark:text-white">Generated Template</h2>
+                        </div>
+                        <div class="p-6">
+                            <button id="adv-generate-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 shadow-lg mb-4">
+                                Generate Advanced Note
+                            </button>
+                            <textarea id="adv-template-output" rows="15" class="w-full p-3 border rounded-md bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200 font-mono text-sm" placeholder="Your generated advanced note will appear here..."></textarea>
+                            <button id="adv-copy-btn" class="mt-4 bg-green-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition-all duration-300 shadow-lg">
+                                Copy to Clipboard
+                            </button>
+                            <span id="adv-copy-feedback" class="ml-4 text-green-600 font-medium hidden">Copied!</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+        
+        <main id="tab-content-simple" class="tab-content hidden">
             
             <div class="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-md">
                 <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-t-lg">
@@ -172,8 +386,8 @@
             </div>
 
         </main>
-
-        <div id="tab-content-checklist" class="tab-content hidden">
+        
+        <main id="tab-content-checklist" class="tab-content hidden">
             <div id="main-header" class="text-center mb-8">
                 </div>
             
@@ -184,7 +398,40 @@
                 
                 </main>
 
-        </div>
+        </main>
+
+        <main id="tab-content-reference" class="tab-content hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md">
+                <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-t-lg">
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Reference Tools</h2>
+                </div>
+                
+                <div class="border-b border-gray-200 dark:border-gray-700">
+                    <nav class="flex -mb-px p-4" aria-label="Tabs">
+                        <button id="ref-tab-btn-abbr" class="tab-btn active !text-base !font-medium !border-b-2 !py-3 px-4">
+                            Abbreviations
+                        </button>
+                        <button id="ref-tab-btn-loc" class="tab-btn !text-base !font-medium !border-b-2 !py-3 px-4">
+                            Locations &amp; Surgery Centers
+                        </button>
+                    </nav>
+                </div>
+                
+                <div id="ref-tab-content-abbr" class="ref-tab-content p-6">
+                    <input type="text" id="ref-abbr-search" placeholder="Search abbreviations (e.g., OD, ARMD)..." class="w-full p-3 border rounded-md dark:bg-gray-700 dark:border-gray-600 mb-4">
+                    <div id="ref-abbr-list" class="max-h-[600px] overflow-y-auto space-y-3">
+                        </div>
+                </div>
+                
+                <div id="ref-tab-content-loc" class="ref-tab-content hidden p-6">
+                    <input type="text" id="ref-loc-search" placeholder="Search locations (e.g., Jackson, Chelsea)..." class="w-full p-3 border rounded-md dark:bg-gray-700 dark:border-gray-600 mb-4">
+                    <div id="ref-loc-list" class="max-h-[600px] overflow-y-auto space-y-3">
+                        </div>
+                </div>
+
+            </div>
+        </main>
+
     </div>
     
     <div id="confirmation-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -212,12 +459,354 @@
 
     <script>
         
-        // --- MODIFIED SCRIPT FROM QA CHECKLIST.HTML ---
+        // --- NEW (v0.3): DATA FROM CSV FILES ---
+        
+        /**
+         * Data parsed from 'Note to Clipboard's v2 - Data_validation.csv'
+         */
+        const dataValidation = {
+            scriptedFormat: [
+                "AllScripts > New Patient", "AllScripts > Established Patient", "AllScripts > ER Appointment Schedule",
+                "AllScripts > HIPAA Notes (Temp Auth)", "AllScripts > HIPAA Notes (Perm Auth)", "AllScripts > Cataract Eval Schedule",
+                "NexTech > Regular Appointment Schedule", "NexTech > Appointment Cancelling", "NexTech > Appointment Rescheduling",
+                "NexTech > ER Appointment Schedule", "NexTech > Medication Refill", "NexTech > Relay or Request prior Auth",
+                "NexTech > Inquiry on a medication or script"
+            ],
+            triageReason: [
+                "Post Op complaint (OS) 1 month of Sx", "Post Op complaint (OD) 1 month of Sx", "Eyelid issue (OS)", "Eyelid issue (OD)",
+                "Eyelid issue (OU)", "Trauma to the eye (OS)", "Trauma to the eye (OD)", "Trauma to the eye (OU)", "Flashes of Light (OS)",
+                "Flashes of Light (OD)", "Flashes of Light (OU)", "Double vision (OS)", "Double vision (OD)", "Double vision (OU)",
+                "Blurred vision (OS)", "Blurred vision (OD)", "Blurred vision (OU)", "Red Eye w/ Pain (OS)", "Red Eye w/ Pain (OD)",
+                "Red Eye w/ Pain (OU)", "Eye Pain (OS)", "Eye Pain (OD)", "Eye Pain (OU)", "Vision Loss (OS)", "Vision Loss (OD)",
+                "Vision Loss (OU)", "Sudden Floaters or Spots (OS)", "Sudden Floaters or Spots (OD)", "Sudden Floaters or Spots (OU)",
+                "Veil, Shadow, Curtain or Spider (OS)", "Veil, Shadow, Curtain or Spider (OD)", "Veil, Shadow, Curtain or Spider (OU)",
+                "Embedded Eyelash (OS)", "Embedded Eyelash (OD)", "Embedded Eyelashes (OU)", "Gradual decrease of vision (OS)",
+                "Gradual decrease of vision (OD)", "Gradual decrease of vision (OU)", "Abrasion/ Scratch on cornea (OS)",
+                "Abrasion/ Scratch on cornea (OD)", "Abrasion/ Scratch on corneas (OU)", "Stye (OS)", "Stye (OD)", "Stye (OU)",
+                "Chemical Substance in the eye (OS)", "Chemical Substance in the eye (OD)", "Chemical Substance in the eye (OU)",
+                "Chalazion (OS)", "Chalazion (OD)", "Chalazion (OU)", "Foreign Body in (OS)", "Foreign Body in (OD)",
+                "Foreign Body in (OU)", "Blurry Vision (OS)", "Blurry Vision (OD)", "Blurry Vision (OU)", "Light Sensitivity (OS)",
+                "Light Sensitivity (OD)", "Light Sensitivity (OU)", "Eye complaints-Infection Discharge (OS)",
+                "Eye complaints-Infection Discharge (OD)", "Eye complaints-Infection Discharge (OU)", "Conjunctivitis (Pink Eye, OS)",
+                "Conjunctivitis (Pink Eye, OD)", "Conjunctivitis (Pink Eyes, OU)", "Eye Laceration (OS)", "Eye Laceration (OD)",
+                "Eye Laceration (OU)", "Red/Itchy eye (OS)", "Red/Itchy eye (OD)", "Red/Itchy eye (OU)", "Red eye (OS)", "Red eye (OD)",
+                "Red eye (OU)", "Cataracts (OS)", "Cataracts (OD)", "Cataracts (OU)", "Diabetic Eye (OS)", "Diabetic Eye (OD)",
+                "Diabetic Eye (OU)", "Glaucoma (OS)", "Glaucoma (OD)", "Glaucoma (OU)"
+            ],
+            painLevels: [
+                "No Pain", "Pain level: Low (1-4) OS", "Pain level: Low (1-4) OD", "Pain level: Low (1-4) OU",
+                "Pain level: Medium (5-7) OS", "Pain level: Medium (5-7) OD", "Pain level: Medium (5-7) OU",
+                "Pain level: High (8-10) OS", "Pain level: High (8-10) OD", "Pain level: High (8-10) OU"
+            ],
+            symptoms: [
+                "No Onset Symptoms", "Burning OS", "Burning OD", "Burning OU", "Redness OS", "Redness OD", "Redness OU",
+                "Tearing OS", "Tearing OD", "Tearing OU", "Itching OS", "Itching OD", "Itching OU", "Floaters OS",
+                "Floaters OD", "Floaters OU", "Flashes of light OS", "Flashes of light OD", "Flashes of light OU",
+                "Curtain/Web/Veil OS", "Curtain/Web/Veil OD", "Curtain/Web/Veil OU", "Sharp pain OS", "Sharp pain OD",
+                "Sharp pain OU", "Light sensitivity OS", "Light sensitivity OD", "Light sensitivity OU", "Foreign body sensation OS",
+                "Foreign body sensation OD", "Foreign body sensation OU", "Headaches with VA OS", "Headaches with VA OD", "Headaches with VA OU"
+            ],
+            prevEyeSx: ["N/A", "Prev Eye Sx: OS", "Prev Eye Sx: OD", "Prev Eye Sx: OU"],
+            clWearer: ["N/A", "CL soft OS", "CL soft OD", "CL soft OU", "CL hard OS", "CL hard OD", "CL hard OU"]
+        };
+        
+        /**
+         * Data parsed from 'Note to Clipboard's v2 - Sheet5.csv' and 'Data_validation.csv'
+         */
+        const allLocations = [
+            // From Data_validation.csv
+            { name: "Adrian Office", address: "1801 W. Maumee, Suite 100, Adrian, MI 49221", phone: "", fax: "" },
+            { name: "Ann Arbor Office", address: "2350 E. Stadium Blvd, Suite 10, Ann Arbor, MI 48104", phone: "", fax: "" },
+            { name: "Battle Creek", address: "363 Fremont Street, Suite 301, Battle Creek, MI 49017", phone: "", fax: "" },
+            { name: "Chelsea Office", address: "1600 Commerce Park Dr, Suite 100, Chelsea, MI 48118", phone: "", fax: "" },
+            { name: "Jackson Office", address: "1116 W. Ganson Ave. Jackson, MI 49202", phone: "", fax: "" },
+            { name: "Jackson Retina Institute", address: "850 W. North Street, Suite 100", phone: "", fax: "" },
+            { name: "Lansing – Lake Lansing Office", address: "1515 Lake Lansing Rd, Suite H, Door 4, Lansing, MI 48912", phone: "", fax: "" },
+            { name: "Lansing Office – Jolly", address: "3390 East Jolly Road, Lansing, MI 48910", phone: "", fax: "" },
+            { name: "Kalamazoo Office", address: "4016 W. Main Street, Kalamazoo, MI 49006", phone: "", fax: "" },
+            { name: "Owosso Office", address: "812 Bradley Street, Owosso, MI 48867", phone: "", fax: "" },
+            { name: "Bryan Office", address: "1236 S Main St, Bryan, OH 43506", phone: "", fax: "" },
+            { name: "Toledo Office", address: "3000 Regency Ct, Suite 100, Toledo, OH 43623", phone: "", fax: "" },
+            // From Sheet5.csv
+            { name: "Blakewoods Surgery Center", address: "2775 Blake Rd., Jackson, MI 49207", phone: "517-787-2906", fax: "517-787-3039" },
+            { name: "Brookside Surgery Center - Sx center handles PreSx Testing", address: "3600 Capital Ave SW, Ste 101, Battle Creek,49015", phone: "269-979-2490", fax: "" },
+            { name: "Bryan Hospital", address: "433 W. High St., Bryan, OH 43506", phone: "419-636-1131", fax: "" },
+            { name: "Bricker Buseth OD Low Vision Specialist MI", address: "MI Mobile Vision, 2500 Reynolds Rd, Jackson, MI 49201", phone: "517-269-0318", fax: "" },
+            { name: "Chelsea Community Hospital", address: "775 S. Main St., Ste. 1, Chelsea, MI 48118", phone: "734-593-6000", fax: "" },
+            { name: "Eye Care Associates of Charlotte", address: "123 Lansing St., Charlotte, MI 48813", phone: "517-543-2020", fax: "" },
+            { name: "Forest Health", address: "135 S. Prospect St., Ypsilanti, Mi 48198", phone: "734-547-4711 734-547-4700", fax: "" },
+            { name: "Fulton County Health Center", address: "725 S. Shoop Ave. Wauseon, OH 43567", phone: "419-335-2015", fax: "" },
+            { name: "Genesis Surgery Center", address: "3400 E. Jolly Rd., Lansing, MI 48910", phone: "517-708-3200", fax: "" },
+            { name: "Hayes Green Beach", address: "321 E. Harris St., Charlotte, MI 48813", phone: "517-543-1050", fax: "" },
+            { name: "Henry Ford Allegiance Health", address: "205 N. East Ave., Jackson, MI 49203", phone: "517-205-4800", fax: "" },
+            { name: "Hickman Hospital", address: "5640 N. Adrian HWY, Adrian, MI 49221", phone: "419-291-3000", fax: "" },
+            { name: "MVP Surgery Center of Lansing", address: "7397 E Saginaw St, East Lansing, MI 48823", phone: "517-897-9417", fax: "517-220-9683" },
+            { name: "McLaren Hospital", address: "401 W. Greenlawn Ave., Lansing, MI 48910", phone: "517-975-6000", fax: "" },
+            { name: "Kellogg Eye Center - Ann Arbor", address: "1000 Wall St., Ann Arbor, MI 48105", phone: "734-763-8122", fax: "734-232-2332" },
+            { name: "Kellogg Eye Center - Grand Blanc", address: "3181 E Grand Blanc Rd, Grand Blanc, MI 48439", phone: "734-764-4190", fax: "" },
+            { name: "Michigan Surgical Center", address: "2075 Coolidge Rd., East Lansing, MI 48823", phone: "517-319-9000", fax: "" },
+            { name: "MSU Neurology & Ophthalmology", address: "804 Service Rd A117, East Lansing, MI 48824", phone: "517-353-8122", fax: "" },
+            { name: "Novi", address: "25500 Meadowbrook Rd #110, Novi, MI 48375", phone: "248-477-2200", fax: "" },
+            { name: "Parkway Surgical Center", address: "2120 Central Ave., Toledo, OH 43606", phone: "419-531-8349", fax: "" },
+            { name: "Promedica Toledo Hospital", address: "2142 N. Cove Blvd., Toledo, OH 43606", phone: "419-291-4000", fax: "" },
+            { name: "Retina Vitreous Assoc - Bryan", address: "201 Van Gundy Dr #B,, Bryan, OH 43506", phone: "419-636-6068", fax: "419-636-5723" },
+            { name: "Retina Vitreous Assoc - Toledo", address: "3740 W Sylvania Ave Ste 101, Toledo, OH 43623", phone: "419-578-4367", fax: "419-537-5639" },
+            { name: "The Sight Center of NW Ohio, Low Vision Specialists OH", address: "1002 Garden Lake Pkwy, Toledo, OH 43614", phone: "419-720-3937 800-624-8378", fax: "419-720-3938" },
+            { name: "Sparrow Hospital", address: "1215 E. Michigan Ave., Lansing, MI 48912", phone: "517-364-1000", fax: "" },
+            { name: "St. Vincent Hospital", address: "2213 Cherry St., Toledo, OH 43608", phone: "419-251-8000", fax: "" },
+            { name: "Surgery Center at Kalamazoo", address: "3200 W Centre Ave, Suite 101, Portage, MI 49024", phone: "269-323-9905", fax: "" },
+            { name: "Surgery Center at Regency Park", address: "2000 Regency Ct., Ste. 101, Toledo, OH 43623", phone: "419-882-0003", fax: "" },
+            { name: "Promedica/ Vision Associates", address: "3330 Meijer Dr. Ste 1, Toledo, OH 43617", phone: "419-578-2020", fax: "419-539-6323" },
+            { name: "Wayne State University / Kresge Eye Institute - Neuro-Ophthalmology", address: "4717 St Antoine, Detroit, MI 48201", phone: "313-577-8900", fax: "" },
+            { name: "Western Michigan University Blindness and Low Vision Studies", address: "WMU Campus, Kalamazoo, MI 49008", phone: "269-387-3455", fax: "269-387-7227" }
+        ];
+
+        /**
+         * Data parsed from 'Note to Clipboard's v2 - Medical_Abbreviations.csv'
+         */
+        const abbreviations = [
+            { term: "Astig", definition: "Astigmatism", description: "Irregular Shaped Cornea" },
+            { term: "ARMD", definition: "Age-Related Macular Degeneration", description: "An eye disease that damages the central part of the retina (macula) responsible for sharp, detailed vision. Example: reading or driving" },
+            { term: "ANG/PHO", definition: "Angiogram/Photo", description: "Type of image captured for a doctor to see blood vessels in the retina by injecting fluorescent dye into the patient’s bloodstream and then taking pics." },
+            { term: "AT", definition: "Artificial Tears", description: "A type of drop for the eyes" },
+            { term: "BID", definition: "Taken/Used 2x daily", description: "Medication regimen" },
+            { term: "BCVA", definition: "Best Corrected Visual Acuity", description: "Measurement of a person’s visual sharpness when they are wearing their glasses or contact lenses" },
+            { term: "TRUE", definition: "Cataract", description: "Cloudy/opaque portion of lens that can block vision" },
+            { term: "CAT Eval", definition: "Cataract Evaluation", description: "Also known as appt types : long Cat Eval" },
+            { term: "CL", definition: "Contact Lens/Clear Lens", description: "A thin/plastic disc resting on cornea to improve vision" },
+            { term: "CONJ", definition: "Conjunctivitis", description: "Formerly known as Pink Eye" },
+            { term: "K", definition: "Cornea", description: "“Window” of the eye that reflects light to the back of the eye" },
+            { term: "DFE", definition: "Dilated Fundus Exam", description: "An eye exam that uses drops to widen the pupil so that a doctor can see the back of the eye." },
+            { term: "DM", definition: "Diabetes", description: "A chronic illness that occurs when your body has too much blood sugar. (type 1 & 2)" },
+            { term: "DME", definition: "Diabetic Macular Edema", description: "An eye condition that occurs when fluid builds up in the macula of the eye." },
+            { term: "TRUE", definition: "Diabetic Retinopathy", description: "This association with diabetes causes retinal changes and hemorrhaging in the eye. Most common diabetic eye disease." },
+            { term: "Dx", definition: "Diagnosis", description: "The identification of an eye disease or vision problem by an MD" },
+            { term: "EP", definition: "Established Patient", description: "A patient who has been seen here before" },
+            { term: "ER", definition: "Emergency", description: "An urgent situation that poses an immediate risk to health and requires immediate action." },
+            { term: "Gtt", definition: "Drops", description: "Liquid eye drops" },
+            { term: "Glauc", definition: "Glaucoma", description: "A group of eye diseases that result from increased intraocular pressures, resulting in damage to the optic nerve." },
+            { term: "", definition: "Hyperopia", description: "Farsightedness; distant objects are clearer than near objects." },
+            { term: "HVF", definition: "Humphrey Visual Field", description: "Diagnostic Testing performed by technician; flashing lights at different points in the visual field" },
+            { term: "Hx", definition: "History", description: "Patient’s medical history" },
+            { term: "INJ", definition: "Injection", description: "A shot of medication into the cavity of the eye to treat diabetic retinopathy, ARMD, and other infections." },
+            { term: "INO", definition: "In Office Procedure", description: "A procedure performed by an MD in their office setting, using minimal anesthesia, often involving laser treatments or minor surgical interventions." },
+            { term: "IOL", definition: "Intraocular Lens", description: "A small artificial lens implanted in the eye during cataract sx. To replace pt’s natural lens after removal" },
+            { term: "IOP", definition: "Intraocular Pressure", description: "The fluid pressure inside the eye. Commonly see in appt notes as “IOP Check”" },
+            { term: "", definition: "Iris", description: "The ring of muscle fibers behind the cornea that determines eye color; also opens and closes to let light in." },
+            { term: "KCN", definition: "Keratoconus", description: "Hereditary, degenerative condition that causes the cornea to thin and protrude into a cone-like shape." },
+            { term: "", definition: "LASIK", description: "A surgical procedure where the top layer of the cornea is pulled back and sculpted to eliminate near/farsightedness & astigmatism." },
+            { term: "LHI", definition: "Logistics Health Inc", description: "Military Eye Exams (MD only)" },
+            { term: "LV", definition: "Long Visit", description: "An appointment type." },
+            { term: "LVM", definition: "Left Voice Mail", description: "A voice mail message was left." },
+            { term: "", definition: "Lensectomy", description: "This is the surgical removal of the lens. Often used to remove a cataract." },
+            { term: "MD", definition: "Ophthalmologist or any Medical Doctor", description: "A medical doctor who specializes in diagnosing and treating eye and vision conditions, performing surgery, and correction vision." },
+            { term: "ME", definition: "Medical Exam", description: "An eye exam that diagnoses and treats eye diseases." },
+            { term: "", definition: "Macula", description: "Central portion of the retina, responsible for the sharpest sight." },
+            { term: "", definition: "Macular Degeneration", description: "“Rusting of the retina”. Leading cause of blindness in 60+ yrs of age. Can be identified as wet or dry. Dry - the macula’s tissues break down w/gradual vision loss Wet - the macula’s significant decline in vision" },
+            { term: "", definition: "Melanoma", description: "A malignant tumor from pigmented tissue surrounding the eye/eyelid/orbits 7 structures within the eye (choroid & iris)" },
+            { term: "", definition: "Myopia", description: "Nearsightedness, nearer objects are clearer than from afar." },
+            { term: "NMO", definition: "Neuromyelitis Optica", description: "Central nervous system disorder causing inflammation in the nerves of the eye." },
+            { term: "NP", definition: "New Patient", description: "A patient who has never been seen by us before." },
+            { term: "NS", definition: "Nuclear Sclerosis", description: "Age related nuclear cataracts" },
+            { term: "OD", definition: "Optometrist", description: "An eye care professional who performs eye exams, prescribes corrective lenses, and helps manage eye diseases and proactive eye care." },
+            { term: "OD", definition: "Right eye", description: "Your right eyeball." },
+            { term: "OS", definition: "Left Eye", description: "Your left eyeball." },
+            { term: "OU", definition: "Both eyes", description: "Both of your eyeballs. Some refer as bilateral" },
+            { term: "ON", definition: "Optic Nerve", description: "The largest nerve of the eye connecting the retina to the primary visual cortex of the brain." },
+            { term: "PCO", definition: "Posterior Capsule Opacification", description: "Secondary cataract which can form after surgery" },
+            { term: "PK", definition: "Penetrating keratoplasty", description: "A surgical procedure that replaces a damaged part of the cornea with a healthy cornea. Formerly known as “corneal transplant”" },
+            { term: "PRK", definition: "Photorefractive Keratectomy", description: "A laser eye surgery that corrects refractive errors such as myopia & hyperopia & astigmatism." },
+            { term: "PRN", definition: "Pre re Nata - as needed", description: "Commonly used to say “return as needed”" },
+            { term: "PT", definition: "Patient", description: "The patient." },
+            { term: "PO", definition: "Post Operative", description: "A period of time after a surgical procedure" },
+            { term: "", definition: "Presbyopia", description: "Condition when lens loses elasticity due to aging. Reading glasses needed to discern close up objects in fine detail, such as print." },
+            { term: "", definition: "Ptosis", description: "A condition that causes drooping of the upper eyelid" },
+            { term: "QAD", definition: "Taken/used every other day", description: "" },
+            { term: "QD", definition: "Taken/Used Daily", description: "" },
+            { term: "QHS", definition: "Taken/Used at Bedtime", description: "" },
+            { term: "QID", definition: "Taken/used 4x daily", description: "" },
+            { term: "RD", definition: "Retinal Detachment", description: "Occurs when the retina pulls away from its position, causing vision loss. A Medical Emergency. Pt’s might have flashes/floaters or a “curtain” in field of vision." },
+            { term: "RK", definition: "Radial Keratotomy", description: "A surgical procedure used to correct myopia by “flattening” the cornea with small, deep incisions." },
+            { term: "RS", definition: "Re-schedule", description: "Changing the time of a planned appointment." },
+            { term: "", definition: "Retina", description: "The innermost layer of blood vessels and nerves that serve as the “film” of the eye sends signals to the optic nerve." },
+            { term: "ROP", definition: "Retinopathy of prematurity", description: "Disease of the retina, commonly blinding premature infants." },
+            { term: "Rx", definition: "Prescription", description: "A written order from a healthcare professional for a patient to receive a specific medication" },
+            { term: "", definition: "Strabismus", description: "An eye misalignment caused by an imbalance in the muscles holding the eyeball" },
+            { term: "SDX", definition: "Same Day Surgery", description: "A surgical procedure where the pt is performed on and discharged the same day" },
+            { term: "SV", definition: "Short Visit/Short Exam", description: "An appointment type." },
+            { term: "Sx", definition: "Surgery", description: "The use of manual & instrumental techniques to diagnose or treat conditions, etc." },
+            { term: "TID", definition: "Taken/Used 3x daily", description: "" },
+            { term: "TID AC", definition: "Taken/Used 3x daily w/meals", description: "" },
+            { term: "TID HS", definition: "Taken Used 3x daily @bedtime", description: "" },
+            { term: "Ung", definition: "Unguentum", description: "Ointment" },
+            { term: "", definition: "Uveitis", description: "Inflammation of any of the structures of the uvea, including the iris, ciliary body or choroid." },
+            { term: "VA", definition: "Visual Acuity", description: "The clarity of a person’s vision" },
+            { term: "VF", definition: "Visual Field", description: "A diagnostic test used to measure the extent of a person’s peripheral vision & identify blind spots or areas of vision loss. Often used to diagnose glaucoma or retinal detachments." },
+            { term: "", definition: "Vitrectomy", description: "The surgical removal of the vitreous, blood, and or membranes of the eye." },
+            { term: "YAG", definition: "Yttrium Aluminum Garnett", description: "A non-invasive procedure used to remove opacifications that happen after cataract surgery" },
+            { term: "A/V", definition: "Ratio of artery size to the vein size in retina", description: "" },
+            { term: "ALR", definition: "Arteriolar light reflex-measurement of retinal arteries", description: "" },
+            { term: "appt", definition: "Appointment", description: "" },
+            { term: "approx", definition: "Approximately", description: "" },
+            { term: "ARMD or AMD", definition: "Age related macular degeneration", description: "" },
+            { term: "astig", definition: "Astigmatism", description: "" },
+            { term: "AT", definition: "Artificial Tears", description: "" },
+            { term: "b/c", definition: "Because", description: "" },
+            { term: "BC", definition: "Base curve", description: "" },
+            { term: "BCL", definition: "Bandage Contact Lens", description: "" },
+            { term: "BDR", definition: "Background diabetic retinopathy (diabetic eye disease)", description: "" },
+            { term: "BID", definition: "Twice daily", description: "" },
+            { term: "bilat", definition: "Both sides", description: "" },
+            { term: "Bleph", definition: "Blepharitis", description: "" },
+            { term: "BP", definition: "Blood Pressure", description: "" },
+            { term: "BSCL", definition: "Bandage soft Contact Lens", description: "" },
+            { term: "BUL", definition: "Bilateral Upper Lids", description: "" },
+            { term: "BVA", definition: "Best visual acuity", description: "" },
+            { term: "c", definition: "with", description: "" },
+            { term: "C/D", definition: "Ratio of the size of the optic nerve to the disc", description: "" },
+            { term: "Cat", definition: "Cataract", description: "" },
+            { term: "CEE", definition: "Complete Eye Exam", description: "" },
+            { term: "CF or FC", definition: "Count fingers-very poor vision", description: "" },
+            { term: "CHA", definition: "Compound hyperopic astigmatism", description: "" },
+            { term: "ck", definition: "Check", description: "" },
+            { term: "CL", definition: "Contact Lens", description: "" },
+            { term: "CLE", definition: "Clear Lens Exchange", description: "" },
+            { term: "CLF", definition: "Contact Les Fitting", description: "" },
+            { term: "clpol", definition: "Wear contact lens, advised of policy", description: "" },
+            { term: "CMA", definition: "Compound myopic astigmatism", description: "" },
+            { term: "comp", definition: "Comprehensive", description: "" },
+            { term: "cont", definition: "Continued", description: "" },
+            { term: "cx", definition: "Cancel", description: "" },
+            { term: "d/c", definition: "Discontinue", description: "" },
+            { term: "DB", definition: "Diabetes", description: "" },
+            { term: "DES", definition: "Dry eye syndrome", description: "" },
+            { term: "DFE", definition: "Dilated fundus exam", description: "" },
+            { term: "disc", definition: "optic disk", description: "" },
+            { term: "disp", definition: "Disposable", description: "" },
+            { term: "DM", definition: "Diabetic exam", description: "" },
+            { term: "dob", definition: "Date of Birth", description: "" },
+            { term: "DR", definition: "Diabetic retinopathy", description: "" },
+            { term: "DS", definition: "Diopter sphere", description: "" },
+            { term: "DVA", definition: "Distance visual acuity", description: "" },
+            { term: "dx", definition: "Diagnosis", description: "" },
+            { term: "DZ", definition: "Disease", description: "" },
+            { term: "ENH", definition: "Enhancement", description: "" },
+            { term: "EP", definition: "Established Patient", description: "" },
+            { term: "ER", definition: "Emergency Visit/Emergency Room", description: "" },
+            { term: "Eval", definition: "Evaluation", description: "" },
+            { term: "F/U", definition: "Follow up", description: "" },
+            { term: "FB", definition: "Foreign body sensation", description: "" },
+            { term: "FROM", definition: "Full range of motion", description: "" },
+            { term: "GCM", definition: "Glaucoma Center of Michigan", description: "" },
+            { term: "glauc", definition: "Glaucoma", description: "" },
+            { term: "GLs", definition: "Glasses", description: "" },
+            { term: "gonio", definition: "glaucoma test", description: "" },
+            { term: "gs", definition: "glaucoma suspect, unknown risk", description: "" },
+            { term: "gshr", definition: "glaucoma suspect high risk", description: "" },
+            { term: "gslr", definition: "glaucoma suspect low risk", description: "" },
+            { term: "gtt", definition: "drops", description: "" },
+            { term: "H/O", definition: "History of", description: "" },
+            { term: "HA", definition: "Headache", description: "" },
+            { term: "HCL", definition: "Hard contact lens", description: "" },
+            { term: "HPI", definition: "History of present illness", description: "" },
+            { term: "HSV", definition: "Herpes", description: "" },
+            { term: "HTN", definition: "Hypertension", description: "" },
+            { term: "HVF", definition: "Humphrey visual field-full range of motion", description: "" },
+            { term: "hx", definition: "History", description: "" },
+            { term: "HZO", definition: "Shingles", description: "" },
+            { term: "IOL", definition: "Intraocular lens", description: "" },
+            { term: "ion", definition: "Ischemic optic neuropathy, improper blood flow to the optic nerve", description: "" },
+            { term: "IOP", definition: "Intraocular pressure", description: "" },
+            { term: "INO", definition: "Internuclear Ophthalmoplegia", description: "" },
+            { term: "IR or I&R", definition: "Insertion and Removal", description: "" },
+            { term: "k", definition: "cornea", description: "" },
+            { term: "KCN", definition: "Keratoconus", description: "" },
+            { term: "Lasik", definition: "Laser Assisted in Situ Keratomileusis", description: "" },
+            { term: "LCL", definition: "Long Contact Lens Exam", description: "" },
+            { term: "LEX", definition: "Last Eye Exam", description: "" },
+            { term: "LLL", definition: "Left Lower Lid", description: "" },
+            { term: "LPI", definition: "Laser Peripheral Iridotomy/Iridoplasty", description: "" },
+            { term: "LPR", definition: "Long Priority Refractive Exam", description: "" },
+            { term: "LUL", definition: "Left Upper Lid", description: "" },
+            { term: "mac", definition: "macula", description: "" },
+            { term: "mo", definition: "Month", description: "" },
+            { term: "MR", definition: "Medical refraction", description: "" },
+            { term: "N/A", definition: "Non Applicable", description: "" },
+            { term: "N/C", definition: "No Charge", description: "" },
+            { term: "Neo", definition: "Neovascularization - a type of abnormal blood vessel growth", description: "" },
+            { term: "nevus", definition: "spot on back of eye", description: "" },
+            { term: "NLP", definition: "No light perception - fully non-sighted", description: "" },
+            { term: "NP", definition: "Non Preservative or New Patient", description: "" },
+            { term: "NS", definition: "Nuclear Sclerosis", description: "" },
+            { term: "NVA", definition: "Near visual acuity", description: "" },
+            { term: "NVD", definition: "Neovascularization of disc", description: "" },
+            { term: "NVE", definition: "Neovascularization elsewhere", description: "" },
+            { term: "OCT", definition: "Ocular Coherence Tomography", description: "" },
+            { term: "OD", definition: "Right eye", description: "" },
+            { term: "optos", definition: "imaging, back of eye", description: "" },
+            { term: "OS", definition: "Left eye", description: "" },
+            { term: "OU", definition: "Both eyes", description: "" },
+            { term: "PAL", definition: "Progressive add lens", description: "" },
+            { term: "PC", definition: "Posterior Capsule", description: "" },
+            { term: "PC IOL", definition: "Posterior Chamber Intraocular Lens", description: "" },
+            { term: "PCO", definition: "posterior capsule opacification-haziness after cat before YAK", description: "" },
+            { term: "PCP", definition: "Primary Care Physician", description: "" },
+            { term: "PERRLA", definition: "Pupils equal, round, reactive to light, accommodating", description: "" },
+            { term: "PF AT", definition: "Preservative free artificial tears", description: "" },
+            { term: "PH", definition: "Pinhole-exam", description: "" },
+            { term: "PMB", definition: "surgery eye drop after cat", description: "" },
+            { term: "PMMA", definition: "hard contact lenses", description: "" },
+            { term: "PO", definition: "Post-Operative Appt or Post-Op Appt", description: "" },
+            { term: "POAG", definition: "Primary open angle glaucoma", description: "" },
+            { term: "POV", definition: "Point of view", description: "" },
+            { term: "PRN", definition: "As needed", description: "" },
+            { term: "Prog", definition: "Progressive lens", description: "" },
+            { term: "PSC", definition: "Posterior subcapsular cataract", description: "" },
+            { term: "pseudo", definition: "pseudophakia-type of cornea lens", description: "" },
+            { term: "Pt", definition: "Patient", description: "" },
+            { term: "PVD", definition: "Posterior vitreal detachment", description: "" },
+            { term: "qd", definition: "1x per day", description: "" },
+            { term: "Qhr/Q_hr(s)", definition: "Every __ hour", description: "" },
+            { term: "qid", definition: "4x per day", description: "" },
+            { term: "qod", definition: "every other day", description: "" },
+            { term: "RD", definition: "Retinal detachment", description: "" },
+            { term: "reck", definition: "Recheck", description: "" },
+            { term: "Ref", definition: "Referred", description: "" },
+            { term: "Req", definition: "Requested", description: "" },
+            { term: "RGP", definition: "Rigid gas permeable contact lenses", description: "" },
+            { term: "RLE", definition: "Refractive Lens Exchange", description: "" },
+            { term: "RLL/LLL/BLL", definition: "Lower lid(s)", description: "" },
+            { term: "r/s", definition: "Reschedule", description: "" },
+            { term: "RTC", definition: "Return to clinic", description: "" },
+            { term: "RTO", definition: "Return to Office", description: "" },
+            { term: "RUL/LUL/BUL", definition: "Upper lid(s)", description: "" },
+            { term: "Rx", definition: "Prescription", description: "" },
+            { term: "s", definition: "Without", description: "" },
+            { term: "S/P", definition: "Status Post", description: "" },
+            { term: "s/sx", definition: "Signs and symptoms", description: "" },
+            { term: "SCL", definition: "Soft contact lense", description: "" },
+            { term: "SLT", definition: "Selective Laser Trabeculoplasty", description: "" },
+            { term: "subcon hem", definition: "Subconjunctival hemorrhage", description: "" },
+            { term: "TF", definition: "trial frame", description: "" },
+            { term: "tid", definition: "3x a day", description: "" },
+            { term: "tri", definition: "trifocal", description: "" },
+            { term: "ung", definition: "Ointment", description: "" },
+            { term: "VF", definition: "Visual field", description: "" },
+            { term: "VF-FTFC", definition: "Visual field-full to finger counting", description: "" },
+            { term: "w/i", definition: "Within", description: "" },
+            { term: "W/O", definition: "With Out", description: "" },
+            { term: "WNL", definition: "Within normal limits", description: "" },
+            { term: "WT", definition: "Wear time", description: "" },
+            { term: "YAG", definition: "Post cataract laser", description: "" }
+        ];
+
+        
+        // --- MODIFIED SCRIPT FROM QA CHECKLIST.HTML (v0.2) ---
         
         // initialData now only contains requiredSteps.
         // Removed `sections` and `autoFails`.
         const initialData = {
-            title: "💯 QA Score Checklist",
+            title: "💯 Verification Checklist",
             description: "An interactive list for quality assurance scoring.",
             requiredSteps: {
                 hipaa: [
@@ -282,13 +871,19 @@
 
             // Render the checklist (it's hidden by default, but needs to be ready)
             renderFullChecklist();
-            // Add all event listeners for both tabs
-            addEventListeners();
             
-            // --- NEW SCRIPT ---
+            // --- NEW SCRIPT (v0.3) ---
+            populateAdvancedDropdowns();
+            renderReferenceData();
+            addAdvancedGeneratorListeners();
+            addReferenceTabListeners();
+            // --- END NEW SCRIPT (v0.3) ---
+
+            // Add all event listeners for both tabs
+            addEventListeners(); // v0.2 listener function
+            
             // Add listeners for the new generator tab
-            addGeneratorEventListeners();
-            // --- END NEW SCRIPT ---
+            addGeneratorEventListeners(); // v0.2 listener function
         });
         
         function saveState() {
@@ -303,7 +898,7 @@
             updateScorecard();
         }
         
-        // --- Render Functions ---
+        // --- Render Functions (v0.2) ---
         function renderHeader() { 
             const headerEl = document.getElementById('main-header');
             if (headerEl) {
@@ -361,13 +956,8 @@
                 </div>`;
         }
         
-        // REMOVED: renderSections() function
-        // REMOVED: renderAutoFails() function
-
-        // --- Logic & State Management ---
+        // --- Logic & State Management (v0.2) ---
         
-        // REMOVED: checkRequiredStepsCompletion() function
-
         // Modified: calculateScore no longer checks for autofails or optional sections
         function calculateScore() {
             const { requiredSteps } = checklistData;
@@ -435,33 +1025,35 @@
         }
         function hideConfirmationModal() { document.getElementById('confirmation-modal').classList.add('hidden'); }
 
-        // --- Event Listeners ---
+        // --- Event Listeners (v0.2) ---
         function addEventListeners() {
-            // --- NEW TAB SWITCHING LOGIC ---
-            const genBtn = document.getElementById('tab-btn-generator');
-            const checkBtn = document.getElementById('tab-btn-checklist');
-            const genContent = document.getElementById('tab-content-generator');
-            const checkContent = document.getElementById('tab-content-checklist');
+            // --- NEW TAB SWITCHING LOGIC (v0.3) ---
+            const tabButtons = [
+                { btn: document.getElementById('tab-btn-advanced'), content: document.getElementById('tab-content-advanced') },
+                { btn: document.getElementById('tab-btn-simple'), content: document.getElementById('tab-content-simple') },
+                { btn: document.getElementById('tab-btn-checklist'), content: document.getElementById('tab-content-checklist') },
+                { btn: document.getElementById('tab-btn-reference'), content: document.getElementById('tab-content-reference') }
+            ];
 
-            genBtn.addEventListener('click', () => {
-                genBtn.classList.add('active');
-                checkBtn.classList.remove('active');
-                genContent.classList.remove('hidden');
-                checkContent.classList.add('hidden');
+            tabButtons.forEach(tab => {
+                if(tab.btn) {
+                    tab.btn.addEventListener('click', () => {
+                        // Deactivate all
+                        tabButtons.forEach(t => {
+                            t.btn.classList.remove('active');
+                            t.content.classList.add('hidden');
+                        });
+                        // Activate clicked
+                        tab.btn.classList.add('active');
+                        tab.content.classList.remove('hidden');
+                    });
+                }
             });
-            checkBtn.addEventListener('click', () => {
-                checkBtn.classList.add('active');
-                genBtn.classList.remove('active');
-                checkContent.classList.remove('hidden');
-                genContent.classList.add('hidden');
-            });
-            // --- END NEW TAB LOGIC ---
+            // --- END NEW TAB LOGIC (v0.3) ---
 
 
             // --- MODIFIED QA LISTENERS ---
             
-            // REMOVED: addSectionBtn listener
-
             // The 'reset-button' is now added dynamically inside renderRequiredSteps,
             // so we must use event delegation on `document.body` to catch its click.
             
@@ -482,9 +1074,6 @@
                         renderFullChecklist();
                     });
                 }
-
-                // REMOVED: All listeners for .delete-section-btn, .delete-task-btn,
-                // .add-task-btn, and .section-toggle
             });
         }
         
@@ -503,44 +1092,47 @@
                 renderRequiredSteps(); // Re-render to show/hide triage questions
             }
             
-            // REMOVED: .task-checkbox handler
-            // REMOVED: .autofail-checkbox handler
-            
             updateScorecard();
-            // REMOVED: call to checkRequiredStepsCompletion()
             saveState();
         }
 
 
-        // --- NEW SCRIPT FOR TEMPLATE GENERATOR ---
-        // (No changes in this section from v0.1)
+        // --- SCRIPT FOR SIMPLE TEMPLATE GENERATOR (v0.2) ---
         
         function addGeneratorEventListeners() {
             // Toggle visibility of HIPAA name/relationship fields
-            document.getElementById('gen-hipaa-auth').addEventListener('change', (e) => {
-                const details = document.getElementById('gen-hipaa-details');
-                if (e.target.value === 'none') {
-                    details.classList.add('hidden');
-                } else {
-                    details.classList.remove('hidden');
-                }
-            });
+            const hipaaAuth = document.getElementById('gen-hipaa-auth');
+            if(hipaaAuth) {
+                hipaaAuth.addEventListener('change', (e) => {
+                    const details = document.getElementById('gen-hipaa-details');
+                    if (e.target.value === 'none') {
+                        details.classList.add('hidden');
+                    } else {
+                        details.classList.remove('hidden');
+                    }
+                });
+            }
 
             // Toggle visibility of Emergency FD approval field
-            document.getElementById('gen-emergency').addEventListener('change', (e) => {
-                const details = document.getElementById('gen-emergency-details');
-                if (e.target.checked) {
-                    details.classList.remove('hidden');
-                } else {
-                    details.classList.add('hidden');
-                }
-            });
+            const emergencyCheck = document.getElementById('gen-emergency');
+            if(emergencyCheck) {
+                emergencyCheck.addEventListener('change', (e) => {
+                    const details = document.getElementById('gen-emergency-details');
+                    if (e.target.checked) {
+                        details.classList.remove('hidden');
+                    } else {
+                        details.classList.add('hidden');
+                    }
+                });
+            }
 
             // Main Generate Button
-            document.getElementById('generate-btn').addEventListener('click', generateTemplate);
+            const genBtn = document.getElementById('generate-btn');
+            if(genBtn) genBtn.addEventListener('click', generateTemplate);
 
             // Copy to Clipboard Button
-            document.getElementById('copy-btn').addEventListener('click', copyTemplateToClipboard);
+            const copyBtn = document.getElementById('copy-btn');
+            if(copyBtn) copyBtn.addEventListener('click', copyTemplateToClipboard);
         }
 
         function generateTemplate() {
@@ -637,7 +1229,299 @@
                 });
             }
         }
-        // --- END OF NEW SCRIPT ---
+        
+        
+        // --- NEW SCRIPT FOR ADVANCED GENERATOR (v0.3) ---
+        
+        /**
+         * Populates all dropdowns in the advanced tab with data
+         */
+        function populateAdvancedDropdowns() {
+            // Helper function to populate a single select element
+            const populateSelect = (selectId, dataArray) => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = ''; // Clear existing options
+                    dataArray.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item;
+                        option.textContent = item;
+                        select.appendChild(option);
+                    });
+                }
+            };
+            
+            // Populate all dropdowns
+            populateSelect('adv-scripted-format', dataValidation.scriptedFormat);
+            populateSelect('adv-triage-reason', dataValidation.triageReason);
+            populateSelect('adv-triage-pain', dataValidation.painLevels);
+            populateSelect('adv-triage-symptoms', dataValidation.symptoms);
+            populateSelect('adv-triage-prev-sx', dataValidation.prevEyeSx);
+            populateSelect('adv-triage-cl-wearer', dataValidation.clWearer);
+            
+            // Populate locations dropdown
+            const locSelect = document.getElementById('adv-pec-location');
+            if(locSelect) {
+                locSelect.innerHTML = '';
+                allLocations.forEach(loc => {
+                    const option = document.createElement('option');
+                    option.value = loc.name;
+                    option.textContent = loc.name;
+                    locSelect.appendChild(option);
+                });
+            }
+        }
+        
+        /**
+         * Adds event listeners for the Advanced Generator tab
+         */
+        function addAdvancedGeneratorListeners() {
+            // Conditional logic for "Is caller the patient?"
+            document.querySelectorAll('input[name="adv-caller"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const details = document.getElementById('adv-caller-details');
+                    if (e.target.value === 'no') {
+                        details.classList.remove('hidden');
+                    } else {
+                        details.classList.add('hidden');
+                    }
+                });
+            });
+            
+            // Conditional logic for Triage questions
+            document.querySelectorAll('input[name="adv-triage-emergent"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const details = document.getElementById('adv-triage-details');
+                    if (e.target.value === 'yes') {
+                        details.classList.remove('hidden');
+                    } else {
+                        details.classList.add('hidden');
+                    }
+                });
+            });
+            
+            // Generate and Copy buttons
+            document.getElementById('adv-generate-btn').addEventListener('click', generateAdvancedTemplate);
+            document.getElementById('adv-copy-btn').addEventListener('click', copyAdvancedTemplateToClipboard);
+        }
+        
+        /**
+         * Generates the note for the Advanced Generator
+         */
+        function generateAdvancedTemplate() {
+            // --- Get all values ---
+            const isCallerPatient = document.querySelector('input[name="adv-caller"]:checked').value === 'yes';
+            const patientType = document.getElementById('adv-patient-type').value;
+            const callerName = document.getElementById('adv-caller-name').value;
+            const patientName = document.getElementById('adv-patient-name').value || "[Pt Name]";
+            
+            const scriptFormat = document.getElementById('adv-scripted-format').value;
+            const callReason = document.getElementById('adv-call-reason').value;
+            const pecDoctor = document.getElementById('adv-pec-doctor').value || "[Doctor]";
+            const pecLocation = document.getElementById('adv-pec-location').value || "[Location]";
+            
+            const currentApptDate = document.getElementById('adv-current-appt-date').value;
+            const currentApptTime = document.getElementById('adv-current-appt-time').value;
+            const newApptDate = document.getElementById('adv-new-appt-date').value;
+            const recallDate = document.getElementById('adv-recall-date').value;
+            
+            const isEmergent = document.querySelector('input[name="adv-triage-emergent"]:checked').value === 'yes';
+            const triageReason = document.getElementById('adv-triage-reason').value;
+            const triagePain = document.getElementById('adv-triage-pain').value;
+            const triagePrevSx = document.getElementById('adv-triage-prev-sx').value;
+            const triageClWearer = document.getElementById('adv-triage-cl-wearer').value;
+            
+            const miscNotes = document.getElementById('adv-misc-notes').value;
+
+            // --- Build the note (based on Note_Constructor.csv) ---
+            let output = "";
+            
+            // 1. Caller Info
+            const callerIdentity = isCallerPatient ? "(patient)" : `(${callerName}, relative of pt)`;
+            output += `${patientType}: Spoke to caller ${callerIdentity}, who called in to ${getScriptAction(scriptFormat)} for ${patientName} `;
+            
+            // 2. Appointment Info
+            if (currentApptDate && currentApptTime) {
+                output += `previously established on [Date: ${formatDate(currentApptDate)} @ Time: ${formatTime(currentApptTime)}] with Dr. ${pecDoctor} at SEI location: ${pecLocation}.\n`;
+            } else if (callReason) {
+                output += `regarding ${callReason} with Dr. ${pecDoctor} at SEI location: ${pecLocation}.\n`;
+            } else {
+                 output += `.\n`;
+            }
+            
+            // 3. New Appt / Recall
+            if (newApptDate) {
+                output += `Scheduled new appt to: ${formatDate(newApptDate)}\n`;
+            }
+            if (recallDate) {
+                output += `Set up a recall to next available date: ${formatDate(recallDate)}\n`;
+            }
+            
+            output += "\n"; // Add a line break
+            
+            // 4. Triage Info
+            if (isEmergent) {
+                output += `Pt is experiencing: ${triageReason}.\n`;
+                if (triagePain !== "No Pain") {
+                    output += `Pain: ${triagePain}.\n`;
+                }
+            } else {
+                output += "Pt denies any sudden or emergent eye problems.\n";
+            }
+            
+            if (triageClWearer !== "N/A") {
+                output += `Pt is a ${triageClWearer} wearer.\n`;
+            } else {
+                output += "Pt is not a CL wearer currently.\n";
+            }
+            
+            if (triagePrevSx !== "N/A") {
+                output += `Pt has had ${triagePrevSx}.\n`;
+            } else {
+                output += "Pt hasn't had previous eye Sx.\n";
+            }
+            
+            // 5. Misc Notes
+            if (miscNotes) {
+                output += `\n${miscNotes}\n`;
+            }
+            
+            document.getElementById('adv-template-output').value = output.trim();
+        }
+
+        // Helper function to get action text from script format
+        function getScriptAction(scriptFormat) {
+            if (scriptFormat.includes("Cancelling")) return "cancel an appt";
+            if (scriptFormat.includes("Rescheduling")) return "reschedule an appt";
+            if (scriptFormat.includes("Schedule")) return "schedule an appt";
+            if (scriptFormat.includes("Refill")) return "request a refill";
+            if (scriptFormat.includes("Inquiry")) return "make an inquiry";
+            return "discuss an issue";
+        }
+        
+        // Helper to format date as MM/DD/YYYY
+        function formatDate(dateString) {
+            if (!dateString) return "[Date]";
+            const [year, month, day] = dateString.split('-');
+            return `${month}/${day}/${year}`;
+        }
+        
+        // Helper to format time as HH:MM AM/PM
+        function formatTime(timeString) {
+            if (!timeString) return "[Time]";
+            let [hours, minutes] = timeString.split(':');
+            let ampm = 'AM';
+            if (hours >= 12) {
+                ampm = 'PM';
+                if (hours > 12) {
+                    hours -= 12;
+                }
+            }
+            if (hours == '00') {
+                hours = 12;
+            }
+            return `${hours}:${minutes} ${ampm}`;
+        }
+
+        /**
+         * Copies the advanced template to the clipboard
+         */
+        function copyAdvancedTemplateToClipboard() {
+            const outputArea = document.getElementById('adv-template-output');
+            const feedback = document.getElementById('adv-copy-feedback');
+
+            if (navigator.clipboard && outputArea.value) {
+                navigator.clipboard.writeText(outputArea.value).then(() => {
+                    feedback.classList.remove('hidden');
+                    setTimeout(() => {
+                        feedback.classList.add('hidden');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            }
+        }
+        
+        // --- NEW SCRIPT FOR REFERENCE TAB (v0.3) ---
+        
+        /**
+         * Renders the lists for the Reference tab
+         */
+        function renderReferenceData() {
+            const abbrList = document.getElementById('ref-abbr-list');
+            const locList = document.getElementById('ref-loc-list');
+            
+            if (abbrList) {
+                abbrList.innerHTML = abbreviations.map(item => `
+                    <div class="reference-item p-3" data-search="${item.term.toLowerCase()} ${item.definition.toLowerCase()}">
+                        <p class="font-bold text-gray-900 dark:text-white">${item.term ? item.term + ' - ' : ''}${item.definition}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">${item.description}</p>
+                    </div>
+                `).join('');
+            }
+            
+            if (locList) {
+                locList.innerHTML = allLocations.map(item => `
+                    <div class="reference-item p-3" data-search="${item.name.toLowerCase()} ${item.address.toLowerCase()}">
+                        <p class="font-bold text-gray-900 dark:text-white">${item.name}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">${item.address}</p>
+                        ${item.phone ? `<p class="text-sm text-gray-600 dark:text-gray-400"><strong>Phone:</strong> ${item.phone}</p>` : ''}
+                        ${item.fax ? `<p class="text-sm text-gray-600 dark:text-gray-400"><strong>Fax:</strong> ${item.fax}</p>` : ''}
+                    </div>
+                `).join('');
+            }
+        }
+        
+        /**
+         * Adds listeners for the Reference tab (sub-tabs and search)
+         */
+        function addReferenceTabListeners() {
+            // Sub-tab switching
+            const abbrBtn = document.getElementById('ref-tab-btn-abbr');
+            const locBtn = document.getElementById('ref-tab-btn-loc');
+            const abbrContent = document.getElementById('ref-tab-content-abbr');
+            const locContent = document.getElementById('ref-tab-content-loc');
+            
+            if(abbrBtn) {
+                abbrBtn.addEventListener('click', () => {
+                    abbrBtn.classList.add('active');
+                    locBtn.classList.remove('active');
+                    abbrContent.classList.remove('hidden');
+                    locContent.classList.add('hidden');
+                });
+            }
+            if(locBtn) {
+                locBtn.addEventListener('click', () => {
+                    locBtn.classList.add('active');
+                    abbrBtn.classList.remove('active');
+                    locContent.classList.remove('hidden');
+                    abbrContent.classList.add('hidden');
+                });
+            }
+            
+            // Search functionality
+            const abbrSearch = document.getElementById('ref-abbr-search');
+            const locSearch = document.getElementById('ref-loc-search');
+            
+            const filterList = (input, listContainer) => {
+                const searchTerm = input.value.toLowerCase();
+                const items = listContainer.querySelectorAll('.reference-item');
+                items.forEach(item => {
+                    if (item.dataset.search.includes(searchTerm)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            };
+            
+            if(abbrSearch) {
+                abbrSearch.addEventListener('keyup', () => filterList(abbrSearch, document.getElementById('ref-abbr-list')));
+            }
+            if(locSearch) {
+                locSearch.addEventListener('keyup', () => filterList(locSearch, document.getElementById('ref-loc-list')));
+            }
+        }
 
     </script>
 </body>
