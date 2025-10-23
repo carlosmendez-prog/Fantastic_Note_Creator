@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BETA v0.1: Call Center Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Styles from original QA checklist.html */
+        .chevron {
+            transition: transform 0.4s ease-in-out;
+        }
+        .chevron.rotate-180 {
+            transform: rotate(180deg);
+        }
+        .task-section-content {
+            transition: max-height 0.4s ease-in-out, padding-top 0.4s ease-in-out, padding-bottom 0.4s ease-in-out, opacity 0.3s ease-in-out;
+            max-height: 1000px;
+            overflow: hidden;
+            opacity: 1;
+        }
+        .task-section-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        #main-content-wrapper.locked {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        #confirmation-modal-backdrop, #confirmation-modal-panel {
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* NEW STYLES FOR TABS:
+          - 'tab-btn' is the class for the buttons.
+          - 'tab-btn.active' is the style for the currently selected tab.
+          - 'tab-content' is the class for the content sections.
+          - 'tab-content.hidden' is what hides the inactive tab.
+        */
+        .tab-btn {
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+        }
+        .tab-btn.active {
+            border-bottom-color: #2563EB; /* blue-600 */
+            color: #2563EB; /* blue-600 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-4">
+                Call Center Tool (BETA v0.1)
+            </h1>
+            <nav class="flex justify-center border-b border-gray-300 dark:border-gray-700">
+                <button id="tab-btn-generator" class="tab-btn active text-lg font-semibold py-4 px-6 focus:outline-none">
+                    Template Generator
+                </button>
+                <button id="tab-btn-checklist" class="tab-btn text-lg font-semibold py-4 px-6 focus:outline-none">
+                    QA Checklist
+                </button>
+            </nav>
+        </header>
+
+        <main id="tab-content-generator" class="tab-content">
+            
+            <div class="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-md">
+                <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-t-lg">
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">1. Core Call Details</h2>
+                </div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="gen-patient-type" class="block text-sm font-medium mb-1">Patient Type</label>
+                        <select id="gen-patient-type" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                            <option value="EP">Established Patient (EP)</option>
+                            <option value="NP">New Patient (NP)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="gen-template-type" class="block text-sm font-medium mb-1">Template Type</label>
+                        <select id="gen-template-type" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                            <option value="scheduling">Allscripts - Scheduling</option>
+                            <option value="pa-request">Nextech - Prior Auth</option>
+                            <option value="refill-request">Nextech - Refill Request</option>
+                            <option value="med-inquiry">Nextech - Medication Inquiry</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="gen-reason" class="block text-sm font-medium mb-1">Reason for Visit / Symptoms</label>
+                        <input type="text" id="gen-reason" placeholder="e.g., Annual Exam, Flashes/Floaters" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                    </div>
+                    <div>
+                        <label for="gen-referral" class="block text-sm font-medium mb-1">Referral Source</label>
+                        <input type="text" id="gen-referral" placeholder="e.g., Dr. Smith, Google" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                    </div>
+                    <div>
+                        <label for="gen-insurance" class="block text-sm font-medium mb-1">Insurance</label>
+                        <input type="text" id="gen-insurance" placeholder="e.g., BCBS, Aetna" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="gen-med-pharm" class="block text-sm font-medium mb-1">Medication / Pharmacy Info</label>
+                        <input type="text" id="gen-med-pharm" placeholder="For Refill/PA/Inquiry only" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6 bg-yellow-50 dark:bg-yellow-900/50 border-2 border-yellow-400 rounded-xl shadow-md">
+                <div class="p-4 bg-yellow-100 dark:bg-yellow-800/60 rounded-t-lg">
+                    <h2 class="text-lg font-bold text-yellow-800 dark:text-yellow-200">2. Mandatory Steps</h2>
+                </div>
+                <div class="p-6 space-y-6">
+                    <div>
+                        <h3 class="font-semibold mb-2 text-gray-800 dark:text-gray-200">HIPAA Authorization</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Who is speaking? (For HIPAA note)</p>
+                        <select id="gen-hipaa-auth" class="w-full md:w-1/2 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                            <option value="none">No note needed</option>
+                            <option value="patient-temp">Patient gave temp auth</option>
+                            <option value="patient-perm">Patient gave perm auth</option>
+                            <option value="behalf-temp">Caller on behalf (temp auth)</option>
+                            <option value="behalf-perm">Caller on behalf (perm auth)</option>
+                        </select>
+                        <div id="gen-hipaa-details" class="grid grid-cols-2 gap-4 mt-4 hidden">
+                            <input type="text" id="gen-auth-name" placeholder="Authorized Name" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                            <input type="text" id="gen-auth-relationship" placeholder="Relationship" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                        </div>
+                    </div>
+                    
+                    <div class="pt-4 border-t border-yellow-300 dark:border-yellow-700">
+                        <h3 class="font-semibold mb-2 text-gray-800 dark:text-gray-200">Additional Notes</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="gen-hmo" class="h-5 w-5 rounded text-blue-600 focus:ring-blue-500">
+                                <label for="gen-hmo" class="ml-3">Patient aware of HMO referral</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="gen-copay" class="h-5 w-5 rounded text-blue-600 focus:ring-blue-500">
+                                <label for="gen-copay" class="ml-3">Patient aware of CoPay/Deductible</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="gen-emergency" class="h-5 w-5 rounded text-blue-600 focus:ring-blue-500">
+                                <label for="gen-emergency" class="ml-3">Emergency Appt (Approved by FD)</label>
+                            </div>
+                            <div id="gen-emergency-details" class="ml-8 hidden">
+                                <label for="gen-fd-name" class="block text-sm font-medium mb-1">Front Desk Name who approved:</label>
+                                <input type="text" id="gen-fd-name" placeholder="e.g., Sarah" class="w-full md:w-1/2 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-md">
+                <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-t-lg">
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">3. Generated Template</h2>
+                </div>
+                <div class="p-6">
+                    <button id="generate-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 shadow-lg mb-4">
+                        Generate Template
+                    </button>
+                    <textarea id="template-output" rows="10" class="w-full p-3 border rounded-md bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200 font-mono text-sm" placeholder="Your generated template will appear here..."></textarea>
+                    <button id="copy-btn" class="mt-4 bg-green-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition-all duration-300 shadow-lg">
+                        Copy to Clipboard
+                    </button>
+                    <span id="copy-feedback" class="ml-4 text-green-600 font-medium hidden">Copied!</span>
+                </div>
+            </div>
+
+        </main>
+
+        <div id="tab-content-checklist" class="tab-content hidden">
+            <div id="main-header" class="text-center mb-8">
+                </div>
+            
+            <div id="scorecard-container" class="sticky top-0 z-10 mb-6"></div>
+
+            <main>
+                <div id="required-steps-container"></div>
+                
+                <div id="main-content-wrapper">
+                    <div class="text-center mb-6">
+                        <button id="add-section-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 shadow-lg">
+                            + Add New Section
+                        </button>
+                    </div>
+                    <div id="sections-container"></div>
+                </div>
+
+                <div id="autofails-container"></div>
+            </main>
+
+            <footer class="text-center mt-8">
+                <button id="reset-button" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-300 transition-all duration-300 shadow-lg">
+                    Reset Checklist
+                </button>
+            </footer>
+        </div>
+    </div>
+    
+    <div id="confirmation-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div id="confirmation-modal-backdrop" class="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
+        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+            <div id="confirmation-modal-panel" class="relative bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl sm:my-8 sm:max-w-lg sm:w-full">
+                <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-red-600 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">Confirm Deletion</h3>
+                            <div class="mt-2"><p class="text-sm text-gray-500 dark:text-gray-400" id="modal-message">Are you sure? This action cannot be undone.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="modal-confirm-btn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">Delete</button>
+                    <button type="button" id="modal-cancel-btn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-500 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+        // --- ORIGINAL SCRIPT FROM QA CHECKLIST.HTML ---
+        // This code powers the "QA Checklist" tab.
+        // It is pasted here exactly as you provided it.
+        const initialData = {
+            title: "💯 QA Score Checklist",
+            description: "An interactive list for quality assurance scoring.",
+            requiredSteps: {
+                hipaa: [
+                    { id: 'h1', text: 'Full Name', points: 2, completed: false },
+                    { id: 'h2', text: 'Date of Birth', points: 2, completed: false },
+                    { id: 'h3', text: 'FULL Address', points: 2, completed: false },
+                    { id: 'h4', text: 'Phone Number', points: 2, completed: false },
+                    { id: 'h5', text: 'Insurance', points: 2, completed: false},
+                ],
+                triage: {
+                    prompt: 'Have you experienced any sudden or emergent Eye Problems?',
+                    answered: null, // 'yes' or 'no'
+                    questions: [
+                         { id: 'q1', text: 'What type of vision problem are you experiencing?', points: 2, completed: false },
+                         { id: 'q2', text: 'In which eye are you having problems? OD, OS or OU', points: 2, completed: false },
+                         { id: 'q3', text: 'Have you recently had surgery?', points: 2, completed: false },
+                         { id: 'q4', text: 'Are you having any pain? Use a scale of 1-10 (10 being the worst)', points: 2, completed: false },
+                         { id: 'q5', text: 'Are you having any symptoms? (Burning, redness, tearing, itching, floaters, flashes of light, curtain/web/veil, sharp pain, light sensitivity, foreign body sensation)', points: 2, completed: false },
+                         { id: 'q6', text: 'Are you having headaches with vision changes?', points: 2, completed: false },
+                         { id: 'q7', text: 'How long have you been experiencing these symptoms?', points: 2, completed: false },
+                         { id: 'q8', text: 'Do you wear contacts?', points: 2, completed: false },
+                    ]
+                }
+            },
+            sections: [
+                { id: 's1', title: "I. Opening & Account Verification", tasks: [
+                    { id: 't1', text: "Use an appropriate greeting", points: 4, notes: '' },
+                    { id: 't2', text: "Access the patient's account", points: 3, notes: '' },
+                    { id: 't3', text: "Verify HIPAA completely (Name, DOB, Address, Phone)", points: 8, notes: 'Points from the required section above.' },
+                    { id: 't4', text: "Confirm insurance information is up-to-date", points: 3, notes: '' },
+                ]},
+                { id: 's2', title: "II. Courtesy & Professionalism", tasks: [
+                    { id: 't5', text: "Show courtesy/empathy and use patient's name", points: 5, notes: 'Lose 1 point if name not used.' },
+                    { id: 't6', text: "Convey confidence and professionalism with enthusiasm", points: 5, notes: '' },
+                    { id: 't7', text: "Remain positive and upbeat", points: 5, notes: '' },
+                    { id: 't8', text: "Use proper grammar and avoid internal jargon", points: 2, notes: '' },
+                ]},
+                { id: 's3', title: "III. Accuracy - Scheduling & Notes", tasks: [
+                    { id: 't14', text: "Practice active listening/Confirm understanding", points: 10, notes: '' },
+                    { id: 't15', text: "Probe by asking appropriate questions", points: 10, notes: '' },
+                ]},
+            ],
+            autoFails: [
+                { id: 'af1', text: "DO NOT disconnect the call without a valid reason." },
+                { id: 'af2', text: "DO NOT fail HIPAA verification." },
+                { id: 'af3', text: "DO NOT fail to access patient account." },
+            ]
+        };
+
+        let checklistData;
+
+        // --- Core Functions ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load QA Checklist state
+            try {
+                const savedState = localStorage.getItem('qaChecklistState');
+                if (savedState) {
+                    const parsedState = JSON.parse(savedState);
+                    if (parsedState && parsedState.requiredSteps && parsedState.sections) {
+                        checklistData = parsedState;
+                    } else {
+                        throw new Error("Saved state is outdated or invalid.");
+                    }
+                } else {
+                    checklistData = JSON.parse(JSON.stringify(initialData));
+                }
+            } catch (e) {
+                console.warn("Failed to load or parse saved state, starting fresh.", e);
+                checklistData = JSON.parse(JSON.stringify(initialData));
+            }
+
+            // Render the checklist (it's hidden by default, but needs to be ready)
+            renderFullChecklist();
+            // Add all event listeners for both tabs
+            addEventListeners();
+            
+            // --- NEW SCRIPT ---
+            // Add listeners for the new generator tab
+            addGeneratorEventListeners();
+            // --- END NEW SCRIPT ---
+        });
+        
+        function saveState() {
+            localStorage.setItem('qaChecklistState', JSON.stringify(checklistData));
+        }
+
+        function renderFullChecklist() {
+            renderHeader();
+            renderScorecardStructure();
+            renderRequiredSteps();
+            renderSections();
+            renderAutoFails();
+            updateScorecard();
+            checkRequiredStepsCompletion();
+        }
+        
+        // --- Render Functions ---
+        function renderHeader() { 
+            // The original header code is now split. The title is in the main H1.
+            // We just render the description into the original header location.
+            const headerEl = document.getElementById('main-header');
+            if (headerEl) {
+                headerEl.innerHTML = `<p class="text-md text-gray-600 dark:text-gray-400">${checklistData.description}</p>`;
+            }
+        }
+        function renderScorecardStructure() { 
+            const el = document.getElementById('scorecard-container');
+            if(el) el.innerHTML = `<div class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-4 rounded-xl shadow-lg"><div class="flex justify-between items-center mb-2"><h3 class="text-xl font-bold text-gray-800 dark:text-white">Total Score</h3><span id="score-display" class="text-2xl font-bold text-gray-900 dark:text-white"></span></div><div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-5"><div id="progress-bar-fill" class="h-5 rounded-full text-white text-xs font-bold flex items-center justify-center transition-all duration-500 ease-in-out" style="width: 0%;"></div></div><p id="autofail-warning" class="text-center text-red-500 font-bold mt-2 animate-pulse" style="display: none;">AUTO FAIL TRIGGERED</p></div>`; 
+        }
+
+        function renderRequiredSteps() {
+            const el = document.getElementById('required-steps-container');
+            if (!el) return;
+
+            const { hipaa, triage } = checklistData.requiredSteps;
+            const isHipaaComplete = hipaa.every(h => h.completed);
+            
+            let hipaaHTML = hipaa.map(item => `
+                <div class="flex items-center mb-2">
+                    <input type="checkbox" id="${item.id}" data-type="hipaa" class="required-checkbox h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" ${item.completed ? 'checked' : ''}>
+                    <label for="${item.id}" class="ml-3 flex-1 text-gray-800 dark:text-gray-200 cursor-pointer">${item.text}</label>
+                </div>`).join('');
+            
+            let triageHTML = `
+                <div id="triage-prompt-container" class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 ${isHipaaComplete ? '' : 'hidden'}">
+                    <p class="font-semibold text-gray-800 dark:text-gray-200">${triage.prompt}</p>
+                    <div class="mt-2 space-x-4">
+                        <label><input type="radio" name="triage-answer" value="yes" class="triage-radio" ${triage.answered === 'yes' ? 'checked' : ''}> Yes</label>
+                        <label><input type="radio" name="triage-answer" value="no" class="triage-radio" ${triage.answered === 'no' ? 'checked' : ''}> No</label>
+                    </div>
+                </div>
+                <div id="triage-questions-container" class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 ${triage.answered === 'yes' ? '' : 'hidden'}">
+                    ${triage.questions.map(q => `
+                        <div class="flex items-center mb-2">
+                            <input type="checkbox" id="${q.id}" data-type="triage-q" class="required-checkbox h-5 w-5 rounded" ${q.completed ? 'checked' : ''}>
+                            <label for="${q.id}" class="ml-3 flex-1 text-sm text-gray-800 dark:text-gray-200">${q.text}</label>
+                        </div>`).join('')}
+                </div>
+            `;
+
+            el.innerHTML = `
+                <div class="mb-6 bg-yellow-50 dark:bg-yellow-900/50 border-2 border-yellow-400 rounded-xl shadow-md">
+                    <div class="p-4 bg-yellow-100 dark:bg-yellow-800/60 rounded-t-lg">
+                        <h2 class="text-lg font-bold text-yellow-800 dark:text-yellow-200">Required Steps</h2>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold mb-2 text-gray-800 dark:text-gray-200">HIPAA Verification</h3>
+                        ${hipaaHTML}
+                        ${triageHTML}
+                    </div>
+                </div>`;
+        }
+        
+        function renderSections() {
+            const container = document.getElementById('sections-container');
+            if (!container) return;
+            container.innerHTML = checklistData.sections.map(section => {
+                const sectionTotalPoints = section.tasks.reduce((sum, task) => sum + (task.points || 0), 0);
+                return `
+                    <div class="mb-6 bg-gray-50 dark:bg-gray-800/50 rounded-xl shadow-md overflow-hidden">
+                        <div class="w-full flex justify-between items-center p-4 bg-gray-100 dark:bg-gray-700">
+                             <button data-section-id="${section.id}" class="section-toggle flex-grow flex items-center text-left">
+                                <h2 class="text-lg font-bold text-gray-900 dark:text-white">${section.title}</h2>
+                            </button>
+                            <div class="flex items-center">
+                                <span class="text-base font-bold text-gray-600 dark:text-gray-300 mr-4">${sectionTotalPoints} pts</span>
+                                <button data-section-id="${section.id}" class="delete-section-btn text-gray-400 hover:text-red-500 p-1 rounded-full"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                                <svg class="w-6 h-6 chevron ml-2 section-toggle" data-section-id="${section.id}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            </div>
+                        </div>
+                        <div id="content-${section.id}" class="p-4 task-section-content">
+                            ${section.tasks.map(task => `
+                                <div class="group flex items-start mb-2 p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                                    <input type="checkbox" id="${task.id}" data-section-id="${section.id}" data-task-id="${task.id}" class="task-checkbox mt-1 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" ${task.completed ? 'checked' : ''}>
+                                    <div class="ml-3 flex-grow">
+                                        <label for="${task.id}" class="flex-1 text-gray-800 dark:text-gray-200 cursor-pointer ${task.completed ? 'line-through text-gray-500' : ''}">${task.text}</label>
+                                        ${task.notes ? `<p class="text-xs text-gray-500 dark:text-gray-400 mt-1 italic">${task.notes}</p>` : ''}
+                                    </div>
+                                    <span class="ml-4 text-sm font-semibold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded-full">${task.points} pts</span>
+                                    <button data-section-id="${section.id}" data-task-id="${task.id}" class="delete-task-btn text-gray-400 hover:text-red-500 p-1 rounded-full ml-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                                </div>
+                            `).join('')}
+                            <div class="mt-4">
+                                <button data-section-id="${section.id}" class="add-task-btn text-sm text-blue-600 hover:text-blue-800 font-semibold">+ Add Task</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        function renderAutoFails() {
+            const container = document.getElementById('autofails-container');
+            if(container) container.innerHTML = `<div class="mt-8 mb-6 bg-red-50 dark:bg-red-900/50 border-2 border-red-500 rounded-xl shadow-lg"><div class="p-4 bg-red-500 text-white rounded-t-lg"><h2 class="text-xl font-extrabold flex items-center"><svg class="w-6 h-6 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>AUTO FAILS: Keep your score above zero</h2></div><div class="p-4">${checklistData.autoFails.map(fail => `<div class="flex items-center mb-2"><input type="checkbox" id="${fail.id}" data-fail-id="${fail.id}" class="autofail-checkbox h-5 w-5 rounded border-gray-300 text-red-600 focus:ring-red-500 cursor-pointer" ${fail.triggered ? 'checked' : ''}><label for="${fail.id}" class="ml-3 flex-1 text-red-800 dark:text-red-100 cursor-pointer">${fail.text}</label></div>`).join('')}</div></div>`;
+        }
+
+        // --- Logic & State Management ---
+        function checkRequiredStepsCompletion() {
+            const wrapper = document.getElementById('main-content-wrapper');
+            if (!wrapper) return;
+            
+            const { hipaa, triage } = checklistData.requiredSteps;
+            const hipaaComplete = hipaa.every(h => h.completed);
+            
+            let triageComplete = false;
+            if (hipaaComplete) {
+                if (triage.answered === 'no') {
+                    triageComplete = true;
+                } else if (triage.answered === 'yes' && triage.questions.every(q => q.completed)) {
+                    triageComplete = true;
+                }
+            }
+            
+            wrapper.classList.toggle('locked', !(hipaaComplete && triageComplete));
+        }
+        
+        function calculateScore() {
+            const { requiredSteps, sections, autoFails } = checklistData;
+            const isAutoFail = autoFails.some(fail => fail.triggered);
+            
+            let totalPossiblePoints = 0;
+            let currentScore = 0;
+
+            const tasks = [
+                ...requiredSteps.hipaa,
+                ...requiredSteps.triage.questions,
+                ...sections.flatMap(s => s.tasks)
+            ];
+
+            for (const task of tasks) {
+                if (task.points) {
+                    totalPossiblePoints += task.points;
+                    if (task.completed) {
+                        currentScore += task.points;
+                    }
+                }
+            }
+            
+            return { score: isAutoFail ? 0 : currentScore, total: totalPossiblePoints, isAutoFail };
+        }
+
+        function updateScorecard() {
+            const { score, total, isAutoFail } = calculateScore();
+            const scoreDisplay = document.getElementById('score-display');
+            const progressBarFill = document.getElementById('progress-bar-fill');
+            const autoFailWarning = document.getElementById('autofail-warning');
+            
+            if (!scoreDisplay || !progressBarFill || !autoFailWarning) return;
+
+            const percentage = total > 0 ? (score / total) * 100 : 0;
+            scoreDisplay.textContent = `${score} / ${total}`;
+            scoreDisplay.className = `text-2xl font-bold ${isAutoFail ? 'text-red-500' : 'text-gray-900 dark:text-white'}`;
+            let colorClass = isAutoFail ? 'bg-red-500' : (percentage >= 90 ? 'bg-green-500' : (percentage >= 70 ? 'bg-yellow-500' : 'bg-orange-500'));
+            progressBarFill.style.width = isAutoFail ? '100%' : `${percentage}%`;
+            progressBarFill.textContent = isAutoFail ? '' : `${percentage.toFixed(0)}%`;
+            progressBarFill.className = `h-5 rounded-full text-white text-xs font-bold flex items-center justify-center transition-all duration-500 ease-in-out ${colorClass}`;
+            autoFailWarning.style.display = isAutoFail ? 'block' : 'none';
+        }
+        
+        function showConfirmationModal(message, onConfirmCallback) { 
+            const modal = document.getElementById('confirmation-modal');
+            const modalMessage = document.getElementById('modal-message');
+            const confirmBtn = document.getElementById('modal-confirm-btn');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+            modalMessage.textContent = message;
+            const confirmHandler = () => { onConfirmCallback(); hideConfirmationModal(); confirmBtn.removeEventListener('click', confirmHandler); cancelBtn.removeEventListener('click', cancelHandler); };
+            const cancelHandler = () => { hideConfirmationModal(); confirmBtn.removeEventListener('click', confirmHandler); cancelBtn.removeEventListener('click', cancelHandler); };
+            confirmBtn.addEventListener('click', confirmHandler);
+            cancelBtn.addEventListener('click', cancelHandler);
+            modal.classList.remove('hidden');
+        }
+        function hideConfirmationModal() { document.getElementById('confirmation-modal').classList.add('hidden'); }
+
+        // --- Event Listeners ---
+        function addEventListeners() {
+            // --- NEW TAB SWITCHING LOGIC ---
+            const genBtn = document.getElementById('tab-btn-generator');
+            const checkBtn = document.getElementById('tab-btn-checklist');
+            const genContent = document.getElementById('tab-content-generator');
+            const checkContent = document.getElementById('tab-content-checklist');
+
+            genBtn.addEventListener('click', () => {
+                genBtn.classList.add('active');
+                checkBtn.classList.remove('active');
+                genContent.classList.remove('hidden');
+                checkContent.classList.add('hidden');
+            });
+            checkBtn.addEventListener('click', () => {
+                checkBtn.classList.add('active');
+                genBtn.classList.remove('active');
+                checkContent.classList.remove('hidden');
+                genContent.classList.add('hidden');
+            });
+            // --- END NEW TAB LOGIC ---
+
+
+            // --- ORIGINAL QA LISTENERS ---
+            const addSectionBtn = document.getElementById('add-section-btn');
+            if (addSectionBtn) {
+                addSectionBtn.addEventListener('click', () => {
+                    const title = prompt("Enter the title for the new section:", "New Section");
+                    if (title) { checklistData.sections.push({ id: 's' + Date.now(), title: title, tasks: [] }); renderSections(); updateScorecard(); saveState(); }
+                });
+            }
+            
+            const resetBtn = document.getElementById('reset-button');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    showConfirmationModal("Are you sure you want to reset the entire checklist to its original state?", () => {
+                        localStorage.removeItem('qaChecklistState');
+                        checklistData = JSON.parse(JSON.stringify(initialData));
+                        renderFullChecklist();
+                    });
+                });
+            }
+            
+            document.body.addEventListener('click', (event) => {
+                const target = event.target;
+                const button = target.closest('button');
+
+                if (target.matches('.required-checkbox, .task-checkbox, .autofail-checkbox, .triage-radio')) {
+                    handleCheckboxAndRadio(target);
+                }
+                
+                if (button) {
+                     if (button.matches('.delete-section-btn')) { showConfirmationModal("Delete this section and all its tasks?", () => { checklistData.sections = checklistData.sections.filter(s => s.id !== button.dataset.sectionId); renderSections(); updateScorecard(); saveState(); }); }
+                     if (button.matches('.delete-task-btn')) { showConfirmationModal("Delete this task?", () => { const s = checklistData.sections.find(s => s.id === button.dataset.sectionId); if(s) { s.tasks = s.tasks.filter(t=>t.id!==button.dataset.taskId); renderSections(); updateScorecard(); saveState(); } }); }
+                     if (button.matches('.add-task-btn')) { const text = prompt("Enter new task text:", "New Task"); if(text){ const pts = parseInt(prompt("Enter points:", "5")); if(!isNaN(pts)){ const s=checklistData.sections.find(s=>s.id===button.dataset.sectionId); if(s){ s.tasks.push({id:'t'+Date.now(),text:text,points:pts,notes:'',completed:false}); renderSections(); updateScorecard(); saveState(); }}} }
+                }
+               
+                const sectionToggle = target.closest('.section-toggle');
+                if (sectionToggle) {
+                    const sectionId = sectionToggle.dataset.sectionId;
+                    const contentEl = document.getElementById(`content-${sectionId}`);
+                    const chevronEl = document.querySelector(`.section-toggle[data-section-id="${sectionId}"] .chevron, .chevron.section-toggle[data-section-id="${sectionId}"]`);
+                    
+                    if(contentEl) contentEl.classList.toggle('collapsed');
+                    if(chevronEl) chevronEl.classList.toggle('rotate-180');
+                }
+            });
+        }
+        
+        function handleCheckboxAndRadio(target) {
+            const { requiredSteps, sections, autoFails } = checklistData;
+            
+            if (target.matches('.required-checkbox')) {
+                const item = (target.dataset.type === 'hipaa' ? requiredSteps.hipaa : requiredSteps.triage.questions).find(i => i.id === target.id);
+                if (item) item.completed = target.checked;
+                renderRequiredSteps(); // Re-render to show/hide triage prompt
+            }
+            if (target.matches('.triage-radio')) {
+                requiredSteps.triage.answered = target.value;
+                renderRequiredSteps(); // Re-render to show/hide triage questions
+            }
+            if (target.matches('.task-checkbox')) {
+                const task = sections.find(s => s.id === target.dataset.sectionId)?.tasks.find(t => t.id === target.dataset.taskId);
+                if (task) task.completed = target.checked;
+                const label = document.querySelector(`label[for="${target.id}"]`);
+                if(label) label.classList.toggle('line-through', target.checked);
+            }
+            if (target.matches('.autofail-checkbox')) {
+                const fail = autoFails.find(f => f.id === target.dataset.failId);
+                if(fail) fail.triggered = target.checked;
+            }
+            
+            updateScorecard();
+            checkRequiredStepsCompletion();
+            saveState();
+        }
+
+
+        // --- NEW SCRIPT FOR TEMPLATE GENERATOR ---
+        
+        function addGeneratorEventListeners() {
+            // Toggle visibility of HIPAA name/relationship fields
+            document.getElementById('gen-hipaa-auth').addEventListener('change', (e) => {
+                const details = document.getElementById('gen-hipaa-details');
+                if (e.target.value === 'none') {
+                    details.classList.add('hidden');
+                } else {
+                    details.classList.remove('hidden');
+                }
+            });
+
+            // Toggle visibility of Emergency FD approval field
+            document.getElementById('gen-emergency').addEventListener('change', (e) => {
+                const details = document.getElementById('gen-emergency-details');
+                if (e.target.checked) {
+                    details.classList.remove('hidden');
+                } else {
+                    details.classList.add('hidden');
+                }
+            });
+
+            // Main Generate Button
+            document.getElementById('generate-btn').addEventListener('click', generateTemplate);
+
+            // Copy to Clipboard Button
+            document.getElementById('copy-btn').addEventListener('click', copyTemplateToClipboard);
+        }
+
+        /**
+         * Gathers all inputs and builds the appropriate template string.
+         * This logic is based on the templates in your 'Call Flow Guide.docx'.
+         */
+        function generateTemplate() {
+            // Get all values from the form
+            const templateType = document.getElementById('gen-template-type').value;
+            const patientType = document.getElementById('gen-patient-type').value;
+            const reason = document.getElementById('gen-reason').value || "N/A";
+            const referral = document.getElementById('gen-referral').value || "N/A";
+            const insurance = document.getElementById('gen-insurance').value || "N/A";
+            const medPharm = document.getElementById('gen-med-pharm').value || "N/A";
+            
+            const hipaaAuth = document.getElementById('gen-hipaa-auth').value;
+            const authName = document.getElementById('gen-auth-name').value || "[Name]";
+            const authRel = document.getElementById('gen-auth-relationship').value || "[Relationship]";
+            
+            const isHmo = document.getElementById('gen-hmo').checked;
+            const isCopay = document.getElementById('gen-copay').checked;
+            const isEmergency = document.getElementById('gen-emergency').checked;
+            const fdName = document.getElementById('gen-fd-name').value || "[FD Name]";
+
+            let output = "";
+
+            // Build the template based on type
+            switch (templateType) {
+                case 'scheduling':
+                    // Allscripts Scheduling Template (4.1)
+                    output += `${patientType} | ${reason} | ${referral} / ${insurance}\n\n`;
+                    if (isCopay) {
+                        output += "pt aware co/pay, ded- future eligibility ck\n";
+                    }
+                    if (isHmo) {
+                        output += "pt aware HMO ref needed\n";
+                    }
+                    if (isEmergency) {
+                        // Nextech Emergency Template (4.2)
+                        output += `\n--- Nextech ER Note ---\n`;
+                        output += `(${reason}) FD (${fdName}) Approved emergency appt.\n`;
+                    }
+                    break;
+                
+                case 'pa-request':
+                    // Nextech Prior Auth (4.2)
+                    output = `Spoke to pt and patient needs prior auth for (${medPharm}) sent to (${insurance}).`;
+                    break;
+                
+                case 'refill-request':
+                    // Nextech Refill (4.2)
+                    output = `Spoke to pt and patient needs refill of (${medPharm}) sent to (${medPharm}).`;
+                    break;
+                
+                case 'med-inquiry':
+                    // Nextech Med Inquiry (4.2)
+                    output = `Spoke to pt and they need clarity on (${medPharm}).`;
+                    break;
+            }
+
+            // Add HIPAA Note if selected (4.1.3)
+            if (hipaaAuth !== 'none') {
+                output += "\n--- HIPAA Note ---\n";
+                switch (hipaaAuth) {
+                    case 'patient-temp':
+                        output += `Spoke to pt and authorized (${authName} and ${authRel}) temporarily, to receive information and speak on behalf of (him/her).`;
+                        break;
+                    case 'patient-perm':
+                        output += `Spoke to pt and authorized (${authName} and ${authRel}) permanently to receive information and speak on behalf of (him/her).`;
+                        break;
+                    case 'behalf-temp':
+                        output += `(${authName} and ${authRel}) called on behalf of the patient and received a temporary verbal authorization to speak on behalf.`;
+                        break;
+                    case 'behalf-perm':
+                        output += `(${authName} and ${authRel}) called on behalf of the patient and received a permanent verbal authorization to speak on behalf.`;
+                        break;
+                }
+            }
+
+            // Display the final template
+            document.getElementById('template-output').value = output.trim();
+        }
+
+        /**
+         * Copies the generated template to the user's clipboard
+         * and shows feedback.
+         */
+        function copyTemplateToClipboard() {
+            const outputArea = document.getElementById('template-output');
+            const feedback = document.getElementById('copy-feedback');
+
+            if (navigator.clipboard && outputArea.value) {
+                navigator.clipboard.writeText(outputArea.value).then(() => {
+                    // Show feedback
+                    feedback.classList.remove('hidden');
+                    // Hide feedback after 2 seconds
+                    setTimeout(() => {
+                        feedback.classList.add('hidden');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            }
+        }
+        // --- END OF NEW SCRIPT ---
+
+    </script>
+</body>
+</html>
